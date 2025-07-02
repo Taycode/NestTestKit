@@ -19,9 +19,26 @@ export {
   TypeORMTestAppConfig 
 } from './core/typeorm-test-app-builder';
 
+// Mongoose classes
+export { 
+  MongooseTestDatabase, 
+  MongooseTestDatabaseManager, 
+  mongooseTestDatabaseManager,
+  MongooseSeeder 
+} from './core/mongoose-test-database-manager';
+export { 
+  MongooseTestAppBuilder, 
+  SimpleMongooseTestAppBuilder,
+  createMongooseTestApp, 
+  createMongooseTestAppBuilder,
+  createSimpleMongooseTestAppBuilder,
+  MongooseTestAppConfig 
+} from './core/mongoose-test-app-builder';
+
 // Adapters
 export { PrismaAdapter } from './adapters/prisma-adapter';
 export { TypeORMAdapter, TypeORMConfig } from './adapters/typeorm-adapter';
+export { MongooseAdapter, MongooseConfig } from './adapters/mongoose-adapter';
 
 // Decorators
 export { 
@@ -36,6 +53,12 @@ export {
   WithTypeORMTransaction, 
   getTypeORMTestDatabase 
 } from './decorators/typeorm-test-database.decorator';
+export { 
+  MongooseTestDatabase as MongooseTestDatabaseDecorator, 
+  MongooseTestDatabaseEach, 
+  WithMongooseSession, 
+  getMongooseTestDatabase 
+} from './decorators/mongoose-test-database.decorator';
 
 // Factory system
 export { 
@@ -56,6 +79,12 @@ export {
   defineTypeORMFactory,
   type TypeORMFactoryDefinition 
 } from './factories/typeorm-factory';
+export { 
+  MongooseFactory, 
+  MongooseFactoryManager, 
+  defineMongooseFactory,
+  type MongooseFactoryDefinition 
+} from './factories/mongoose-factory';
 
 // Utilities
 export { 
@@ -79,4 +108,5 @@ export {
 
 // Re-export common types for convenience
 export type { PrismaClient } from '@prisma/client';
-export type { DataSource, Repository, EntityTarget } from 'typeorm'; 
+export type { DataSource, Repository, EntityTarget } from 'typeorm';
+export type { Connection, Model, Document } from 'mongoose'; 

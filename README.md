@@ -1,11 +1,11 @@
 # NestTestKit
 
-A testing utility library for NestJS applications that provides seamless database testing with Prisma and SQLite.
+A testing utility library for NestJS applications that provides seamless database testing with Prisma, TypeORM, and Mongoose.
 
 ## Features
 
-🚀 **Zero Configuration** - Works out of the box with NestJS + Prisma  
-⚡ **Fast SQLite Testing** - In-memory and file-based SQLite databases  
+🚀 **Zero Configuration** - Works out of the box with NestJS + Prisma/TypeORM/Mongoose  
+⚡ **Fast Database Testing** - SQLite, MongoDB Memory Server, and PostgreSQL support  
 🔄 **Multiple Cleanup Strategies** - Transaction rollback, truncate, or recreate  
 🌱 **Flexible Seeding** - Support for seeders with dependency resolution  
 🏭 **Factory System** - Generate realistic test data with factories  
@@ -19,8 +19,14 @@ A testing utility library for NestJS applications that provides seamless databas
 ```bash
 npm install nest-test-kit
 
-# Peer dependencies (if not already installed)
+# Peer dependencies for Prisma users
 npm install @nestjs/common @nestjs/core @nestjs/testing @prisma/client prisma
+
+# Additional peer dependencies for TypeORM users
+npm install @nestjs/typeorm typeorm
+
+# Additional peer dependencies for Mongoose users
+npm install @nestjs/mongoose mongoose mongodb-memory-server
 ```
 
 ## Quick Start
@@ -147,6 +153,115 @@ describe('Transaction Tests', () => {
     // All database changes in this test are automatically rolled back
     await userService.create({ email: 'temp@example.com' });
     // This data won't exist in other tests
+  });
+});
+```
+
+### 5. Mongoose & MongoDB Support
+
+```typescript
+import { createMongooseTestApp, defineMongooseFactory } from 'nest-test-kit';
+import { Schema } from 'mongoose';
+
+const UserSchema = new Schema({
+  email: { type: String, required: true },
+  name: { type: String, required: true },
+  isActive: { type: Boolean, default: true }
+});
+
+const userFactory = defineMongooseFactory('User', (faker) => ({
+  email: faker.internet.email(),
+  name: faker.person.fullName(),
+  isActive: faker.datatype.boolean()
+}));
+
+describe('MongoDB with Mongoose', () => {
+  let module: TestingModule;
+  let connection: Connection;
+
+  beforeAll(async () => {
+    const result = await createMongooseTestApp({
+      providers: [UserService],
+      databaseConfig: {
+        useMemoryServer: true,
+        models: [{ name: 'User', schema: UserSchema }]
+      }
+    });
+
+    module = result.module;
+    connection = result.connection;
+    userFactory.setConnection(connection);
+  });
+
+  afterAll(async () => {
+    await module.close();
+  });
+
+  it('creates users with factory', async () => {
+    const users = await userFactory.createMany(3);
+    expect(users).toHaveLength(3);
+    
+    const found = await userFactory.findOne({ 
+      email: users[0].email 
+    });
+    expect(found).toBeTruthy();
+  });
+});
+```
+
+### 6. TypeORM Support
+
+```typescript
+import { createTypeORMTestApp, defineTypeORMFactory } from 'nest-test-kit';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+
+@Entity()
+class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  email: string;
+
+  @Column()
+  name: string;
+}
+
+const userFactory = defineTypeORMFactory(User, (faker) => ({
+  email: faker.internet.email(),
+  name: faker.person.fullName()
+}));
+
+describe('TypeORM Integration', () => {
+  let module: TestingModule;
+  let dataSource: DataSource;
+
+  beforeAll(async () => {
+    module = await createTypeORMTestApp({
+      entities: [User],
+      providers: [UserService],
+      databaseConfig: {
+        type: 'sqlite',
+        database: ':memory:',
+        synchronize: true
+      }
+    });
+
+    dataSource = module.get<DataSource>(DataSource);
+    userFactory.setDataSource(dataSource);
+  });
+
+  afterAll(async () => {
+    await module.close();
+  });
+
+  it('creates users with TypeORM factory', async () => {
+    const user = await userFactory.create({
+      email: 'typeorm@example.com'
+    });
+
+    expect(user.id).toBeDefined();
+    expect(user.email).toBe('typeorm@example.com');
   });
 });
 ```

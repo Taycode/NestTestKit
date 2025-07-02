@@ -1,7 +1,7 @@
 {
   "name": "nest-test-kit",
   "version": "0.1.0",
-  "description": "A testing utility library for NestJS applications with seamless database testing, multi-ORM support (Prisma & TypeORM), and powerful factory system",
+  "description": "A testing utility library for NestJS applications with seamless database testing, multi-ORM support (Prisma, TypeORM & Mongoose), and powerful factory system",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -16,9 +16,13 @@
     "database",
     "prisma",
     "typeorm",
+    "mongoose",
+    "mongodb",
     "sqlite",
     "test-utilities",
-    "factories"
+    "factories",
+    "memory-server",
+    "seeding"
   ],
   "author": "",
   "license": "MIT",
