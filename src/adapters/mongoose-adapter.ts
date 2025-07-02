@@ -149,7 +149,7 @@ export class MongooseAdapter implements DatabaseAdapter {
       // Clear registered models
       this.registeredModels.clear();
 
-    } catch (error) {
+    } catch (error: any) {
       logger.warn('Error while closing MongoDB connection:', error);
     }
   }
@@ -162,7 +162,7 @@ export class MongooseAdapter implements DatabaseAdapter {
     // For MongoDB, we execute commands directly
     try {
       return await this.connection.db.command({ eval: query, args: params || [] });
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to execute MongoDB command: ${error}`);
     }
   }
@@ -286,7 +286,7 @@ export class MongooseAdapter implements DatabaseAdapter {
 
       logger.info('Connected to MongoDB test database');
 
-    } catch (error) {
+    } catch (error: any) {
       throw new DatabaseError(
         `Failed to connect to MongoDB: ${error}`,
         {
@@ -346,7 +346,7 @@ export class MongooseAdapter implements DatabaseAdapter {
       }
 
       // Delete all documents from each collection
-      const deletePromises = collections.map(async (collection) => {
+      const deletePromises = collections.map(async (collection: any) => {
         const collectionName = collection.name;
         
         // Skip system collections

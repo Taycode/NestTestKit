@@ -27,9 +27,12 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
     "@nestjs/typeorm": "^10.0.0",
+    "@nestjs/mongoose": "^10.0.0",
     "@prisma/client": "^5.0.0",
     "prisma": "^5.0.0",
-    "typeorm": "^0.3.0"
+    "typeorm": "^0.3.0",
+    "mongoose": "^8.0.0",
+    "mongodb-memory-server": "^9.0.0"
   },
   "dependencies": {
     "tmp": "^0.2.1",
